@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        body, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, li {
+            list-style-type: none;
+        }
+
+        .sp-slider {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            height: 534px;
+        }
+
+        .slider {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6830px;
+            height: 534px;
+        }
+
+        .slider div {
+            height: 534px;
+            float: left;
+        }
+
+        .slider div a {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .sp-slider ul {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            background: #fff;
+            border-radius: 15px;
+        }
+
+        .sp-slider ul li {
+            float: left;
+            width: 20px;
+            height: 20px;
+            margin: 5px;
+            border-radius: 50%;
+            background: #000;
+            opacity: 0.5;
+            filter: Alpha(Opacity=50);
+            cursor: pointer;
+            text-align: center;
+            text-indent: -999999px;
+        }
+
+        .sp-slider ul li.show {
+            background: #CDE074;
+            opacity: 1;
+            filter: Alpha(Opacity=100);
+        }
+
+        .sp-slider .slider-pre {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin: 0;
+            background-image: url("icon-slides.png");
+            background-repeat: no-repeat;
+            background-position: -84px center;
+        }
+
+        .sp-slider .slider-pre {
+            width: 41px;
+            height: 69px;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin: -35px 0 0 0;
+            background-image: url("icon-slides.png");
+            background-repeat: no-repeat;
+            background-position: -84px center;
+        }
+
+        .sp-slider .slider-next {
+            width: 41px;
+            height: 69px;
+            display: block;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            margin: -35px 0 0 0;
+            background-image: url("icon-slides.png");
+            background-repeat: no-repeat;
+            background-position: -125px center;
+        }
+
+        .sp-slider .slider-next:hover {
+            background-position: -43px center;
+        }
+
+        .sp-slider .slider-pre:hover {
+            background-position: 0 center;
+        }
+    </style>
+</head>
+<body>
+<div class="sp-slider">
+    <div class="slider">
+        <div style="background: url(s-1.png) no-repeat center center">
+            <a href="###">11111111111111</a>
+        </div>
+        <div style="background: url(s-1.png) no-repeat center center">
+            <a href="###">2222222222222222</a>
+        </div>
+        <div style="background: url(s-1.png) no-repeat center center">
+            <a href="###">33333333333333333</a>
+        </div>
+        <div style="background: url(s-1.png) no-repeat center center">
+            <a href="###">44444444444444</a>
+        </div>
+        <div style="background: url(s-1.png) no-repeat center center">
+            <a href="###">555555555555555</a>
+        </div>
+    </div>
+    <ul>
+        <li class="show">1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+    </ul>
+    <a class="slider-pre" href="###"></a>
+    <a class="slider-next" href="###"></a>
+</div>
+<script type="text/javascript">
+    var spSlider = getElementByClass("sp-slider")[0],
+            oSlider = getElementByClass("slider")[0],
+            oUl = getElementByClass("sp-slider")[0].getElementsByTagName("ul")[0],
+            oLis = getChildren(oUl, "li"),
+            oDivs = getChildren(oSlider, "div"),
+            oDivw = getWin("offsetWidth"),
+            oPre = getChildren(spSlider, "a")[0],
+            oNext = getChildren(spSlider, "a")[1],
+            step = 0,
+            speed = 500,//每张图需要多长时间移动到目的地,注意不要大于自动播放时间
+            autoTime = 2000,//每隔多长时间自动切换到下一张
+            clickWait = 5000;//手动切换后停留时间
+
+
+    //把第一张克隆插入到最后面
+    var oneDiv = oDivs[0].cloneNode(true);
+    oSlider.appendChild(oneDiv);
+
+    //初始化宽度
+    oDivs = getChildren(oSlider, "div");
+    oSlider.style.width = oDivw * oDivs.length + "px";
+    for (var i = 0; i < oDivs.length; i++) {
+        oDivs[i].style.width = oDivw + "px";
+    }
+
+    //焦点点击切换
+    for (var i = 0; i < oLis.length; i++) {
+        oLis[i].onclick = (function (i) {
+            return function () {
+                if (oSlider.timer) {
+                    return;
+                }
+                window.clearInterval(autoTimer);
+                step = i;
+                move();
+                autoTimer = window.setTimeout(function () {
+                    autoTimer = window.setInterval(autoMove, autoTime);
+                }, clickWait)
+            };
+        })(i)
+    }
+
+    //左右切换
+    oPre.onclick = function () {
+        if (oSlider.timer) {
+            return;
+        }
+        step--;
+        window.clearInterval(autoTimer);
+        move();
+
+        autoTimer = window.setTimeout(function () {
+            autoTimer = window.setInterval(autoMove, autoTime);
+        }, clickWait)
+    };
+    oNext.onclick = function () {
+        if (oSlider.timer) {
+            return;
+        }
+        step++;
+        window.clearInterval(autoTimer);
+        move();
+
+        autoTimer = window.setTimeout(function () {
+            autoTimer = window.setInterval(autoMove, autoTime);
+        }, clickWait)
+    };
+
+
+    //焦点按钮点亮
+    function liShow(step) {
+        for (var i = 0; i < oLis.length; i++) {
+            removeClass(oLis[i], "show");
+        }
+        if (step == oLis.length) {
+            addClass(oLis[0], "show");
+        } else {
+            addClass(oLis[step], "show");
+        }
+    }
+
+    //运行
+    function move() {
+        if (step > oDivs.length - 1) {
+            step = 0;
+            oSlider.style.left = 0;
+            step++;
+            console.log(step);
+        } else if (step < 0) {
+            step = oDivs.length - 1;
+            oSlider.style.left = -oDivw * step + "px";
+            step--;
+            animate(oSlider, "left", -oDivw * step, speed);
+            return;
+        }
+        animate(oSlider, "left", -oDivw * step, speed);
+    }
+
+    //自动运行
+    function autoMove() {
+        if (oSlider.timer) {
+            return;
+        }
+        step++;
+        move(step);
+    }
+    var autoTimer = window.setInterval(autoMove, autoTime);
+
+    //当浏览器窗口变动的时候重新计算宽度,并重新赋值
+    window.onresize = function () {
+        oDivw = getWin("offsetWidth");
+        for (var i = 0; i < oDivs.length; i++) {
+            oDivs[i].style.width = oDivw + "px";
+        }
+        oSlider.style.width = oDivw * oDivs.length + "px";
+        oSlider.style.left = -oDivw * step + "px";
+    };
+
+
+    //动画
+    //        animate(oSlider, "left", -oDivw, 3000);
+    function animate(ele, attr, target, alltime) {
+        var begin = getCss(ele, attr);
+        var change = target - begin;
+        var time = 0;
+        var interval = 10;
+        move()
+        function move() {
+            time += interval;
+            ele.timer = window.setTimeout(move, interval);
+            if (time < alltime) {
+                ele.style[attr] = time / alltime * change + begin + "px";
+            } else {
+                ele.style[attr] = target + "px";
+                liShow(step);
+                window.clearTimeout(ele.timer);
+                ele.timer = null;
+            }
+
+        }
+
+    }
+
+
+    function getCss(ele, attr) {
+        var val = null;
+        if (window.getComputedStyle) {
+            val = window.getComputedStyle(ele, null)[attr];
+        } else {
+            val = ele.currentStyle[attr];
+        }
+        val = parseFloat(val);
+        return val;
+    }
+
+    function toArray(likeAry) {
+        var ary = [];
+        try {
+            ary = [].slice.call(likeAry, 0)
+        } catch (e) {
+            for (var i = 0; i < likeAry.length; i++) {
+                ary[i] = likeAry[i];
+            }
+        }
+        return ary;
+    }
+
+    function getElementByClass(cName, context) {
+        context = context || document;
+        if (document.getElementsByClassName) {
+            return this.toArray(context.getElementsByClassName(cName));
+        }
+        var allTag = context.getElementsByTagName("*"), ary = [], reg = new RegExp("(?:^| +)" + cName + "(?: +|$)");
+        for (var i = 0; i < allTag.length; i++) {
+            var cur = allTag[i];
+            reg.test(cur.className) ? ary.push(cur) : void 0;
+        }
+        return ary
+    }
+
+    function getChildren(curEle, tagName) {
+        var all = curEle.childNodes, ary = [];
+        for (var i = 0; i < all.length; i++) {
+            var cur = all[i];
+            if (cur.nodeType === 1) {
+                if (typeof tagName != "undefined") {
+                    if (cur.nodeName.toLowerCase() != tagName.toLowerCase()) {
+                        continue;
+                    }
+                }
+                ary.push(cur);
+            }
+        }
+        return ary;
+    }
+
+    function getWin(attr) {
+        return document.documentElement[attr] || document.body[attr];
+    }
+
+    function addClass(curEle, cName) {
+        //首先判断是否存在这个样式,不存在我们才添加
+        if (!this.hasClass(curEle, cName)) {
+            var cc = curEle.className;
+            curEle.className += (cc === "") ? cName : " " + cName;
+            //一定要记住，如果前面有样式值了，我们追加的时候前面加一个空格
+        }
+    }
+
+    //hasClass：判断是否存在某一个样式值
+    function hasClass(curEle, cName) {
+        var reg = new RegExp("(?:^| +)" + cName + "(?: +|$)", "g");
+        return reg.test(curEle.className);
+    }
+
+    //removeClass：移除样式
+    function removeClass(curEle, cName) {
+        //首先判断是否存在这个样式，如果存在我才移除
+        if (hasClass(curEle, cName)) {
+            var reg = new RegExp("(?:^| +)" + cName + "(?: +|$)");
+            curEle.className = curEle.className.replace(reg, " ");
+        }
+    }
+</script>
+</body>
+</html>
